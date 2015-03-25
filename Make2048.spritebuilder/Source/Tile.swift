@@ -9,18 +9,14 @@
 class Tile: CCNode {
   var valueLabel: CCLabelTTF!
   var backgroundNode: CCNodeColor!
-  var value: Int = Int(CCRANDOM_0_1() + 1) * 2 {
+  var value: Int = 0 {
     didSet {
-      self.updateValueDisplay()
+      valueLabel.string = "\(value)"
     }
   }
-  var placeholder = false
+  var mergedThisRound = false
   
   func didLoadFromCCB() {
-    self.updateValueDisplay()
-  }
-  
-  func updateValueDisplay() {
-    valueLabel.string = "\(value)"
+    value = Int(CCRANDOM_MINUS1_1() + 2) * 2
   }
 }

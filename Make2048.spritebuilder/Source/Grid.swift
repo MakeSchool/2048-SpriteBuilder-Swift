@@ -97,6 +97,7 @@ class Grid: CCNodeColor {
   }
   
   func move(direction: CGPoint) {
+    var movedTilesThisRound = false
     // apply negative vector until reaching boundary, this way we get the tile that is the furthest away
     // bottom left corner
     var currentX = 0
@@ -127,8 +128,8 @@ class Grid: CCNodeColor {
     while self.indexValid(currentX, y: currentY) {
       while self.indexValid(currentX, y: currentY) {
         // get tile at current index
-        var tile = gridArray[currentX][currentY]
-        if let t = tile {
+        var currentTile = gridArray[currentX][currentY]
+        if let tile = currentTile {
           // if tile is not nil
           var newX = currentX
           var newY = currentY
@@ -138,8 +139,37 @@ class Grid: CCNodeColor {
             newX += Int(direction.x)
             newY += Int(direction.y)
           }
-          if newX != currentX || newY != currentY {
-            self.moveTile(t, fromX: currentX, fromY: currentY, toX: newX, toY: newY)
+//          if newX != currentX || newY != currentY {
+//            self.moveTile(t, fromX: currentX, fromY: currentY, toX: newX, toY: newY)
+//          }
+          var performMove = false
+          // If we stopped moving in vector direction, but next index in vector direction is valid, this 
+          // means the cell is occupied. Let's check if we can merge them...
+          if self.indexValid(newX+Int(direction.x), y: newY+Int(direction.y)) {
+            // get the other tile
+            var otherTileX = newX + Int(direction.x)
+            var otherTileY = newY + Int(direction.y)
+            if let otherTile = gridArray[otherTileX][otherTileY] {
+              // compare the value of other tile and also check if the other tile has been merged this round
+              if tile.value == otherTile.value && !otherTile.mergedThisRound {
+                self.mergeTileAtIndex(currentX, y: currentY, withTileAtIndex: otherTileX, y: otherTileY)
+                movedTilesThisRound = true
+              } else {
+                // we cannot merge so we want to perform a move
+                performMove = true
+              }
+            }
+          } else {
+            // we cannot merge so we want to perform a move
+            performMove = true
+          }
+          if performMove {
+            // move tile to furthest position
+            if newX != currentX || newY != currentY {
+              // only move tile if position changed
+              self.moveTile(tile, fromX: currentX, fromY: currentY, toX: newX, toY: newY)
+              movedTilesThisRound = true
+            }
           }
         }
         // move further in this column
@@ -147,6 +177,9 @@ class Grid: CCNodeColor {
       }
       currentX += xChange
       currentY = initialY
+    }
+    if movedTilesThisRound {
+      self.nextRound()
     }
   }
   
@@ -178,6 +211,33 @@ class Grid: CCNodeColor {
     var newPosition = self.positionForColumn(toX, row: toY)
     var moveTo = CCActionMoveTo.actionWithDuration(0.2, position: newPosition) as CCActionMoveTo
     tile.runAction(moveTo)
+  }
+  
+  func mergeTileAtIndex(x: Int, y: Int, withTileAtIndex otherX: Int, y otherY: Int) {
+    // Update game data
+    var mergedTile = gridArray[x][y]!
+    var otherTile = gridArray[otherX][otherY]!
+    otherTile.mergedThisRound = true
+    gridArray[x][y] = noTile
+    
+    // Update the UI
+    var otherTilePosition = self.positionForColumn(otherX, row: otherY)
+    var moveTo = CCActionMoveTo.actionWithDuration(0.2, position: otherTilePosition) as CCActionMoveTo
+    var remove = CCActionRemove.action() as CCActionRemove
+    var mergeTile = CCActionCallBlock.actionWithBlock { () -> Void in
+      otherTile.value *= 2
+    } as CCActionCallBlock
+    var sequence = CCActionSequence.actionWithArray([moveTo, mergeTile, remove]) as CCActionSequence
+    mergedTile.runAction(sequence)
+  }
+  
+  func nextRound() {
+    self.spawnRandomTile()
+    for column in gridArray {
+      for tile in column {
+        tile?.mergedThisRound = false
+      }
+    }
   }
   
   func setupGestures() {
