@@ -99,6 +99,7 @@
 		BC619E651AB20461001C4A46 /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC619E611AB20461001C4A46 /* Tile.swift */; };
 		BC619E661AB20461001C4A46 /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC619E611AB20461001C4A46 /* Tile.swift */; };
 		BC619E671AB20461001C4A46 /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC619E611AB20461001C4A46 /* Tile.swift */; };
+		BC812F881AC33AD90051A81C /* GameEnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC812F871AC33AD90051A81C /* GameEnd.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -218,6 +219,7 @@
 		BC5399D71A44DCC90063F482 /* JavaKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaKit.framework; path = "../../../../Library/Application Support/Developer/Shared/Xcode/Platforms/Android.platform/Developer/SDKs/SBAndroid.sdk/System/Library/Frameworks/JavaKit.framework"; sourceTree = "<group>"; };
 		BC619E601AB20461001C4A46 /* Grid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Grid.swift; path = Source/Grid.swift; sourceTree = "<group>"; };
 		BC619E611AB20461001C4A46 /* Tile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Tile.swift; path = Source/Tile.swift; sourceTree = "<group>"; };
+		BC812F871AC33AD90051A81C /* GameEnd.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GameEnd.swift; path = Source/GameEnd.swift; sourceTree = "<group>"; };
 		D352B48019EC608A00829775 /* MetalShaders */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MetalShaders; path = Source/MetalShaders; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -443,6 +445,7 @@
 			isa = PBXGroup;
 			children = (
 				7A046D7519E84C36004C4763 /* MainScene.swift */,
+				BC812F871AC33AD90051A81C /* GameEnd.swift */,
 				BC619E601AB20461001C4A46 /* Grid.swift */,
 				BC619E611AB20461001C4A46 /* Tile.swift */,
 				7A40362019DDEF0D007B6E8F /* Platforms */,
@@ -831,6 +834,7 @@
 				BC619E651AB20461001C4A46 /* Tile.swift in Sources */,
 				5B121038197487F2004C1E1D /* AppDelegate.m in Sources */,
 				BC619E621AB20461001C4A46 /* Grid.swift in Sources */,
+				BC812F881AC33AD90051A81C /* GameEnd.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,6 +1,6 @@
 //
 //  Grid.swift
-//  2048
+//  Make2048
 //
 //  Created by Dion Larson on 2/26/15.
 //  Copyright (c) 2015 Make School. All rights reserved.
@@ -14,9 +14,17 @@ class Grid: CCNodeColor {
   var columnHeight: CGFloat = 0
   var tileMarginVertical: CGFloat = 0
   var tileMarginHorizontal: CGFloat = 0
+  let winTile = 2048
   
   var gridArray = [[Tile?]]()
   var noTile: Tile? = nil
+  
+  var score: Int = 0 {
+    didSet {
+      var mainScene = self.parent as MainScene
+      mainScene.scoreLabel.string = "\(score)"
+    }
+  }
   
   func didLoadFromCCB() {
     self.setupBackground()
@@ -128,8 +136,7 @@ class Grid: CCNodeColor {
     while self.indexValid(currentX, y: currentY) {
       while self.indexValid(currentX, y: currentY) {
         // get tile at current index
-        var currentTile = gridArray[currentX][currentY]
-        if let tile = currentTile {
+        if let tile = gridArray[currentX][currentY] {
           // if tile is not nil
           var newX = currentX
           var newY = currentY
@@ -152,7 +159,7 @@ class Grid: CCNodeColor {
             if let otherTile = gridArray[otherTileX][otherTileY] {
               // compare the value of other tile and also check if the other tile has been merged this round
               if tile.value == otherTile.value && !otherTile.mergedThisRound {
-                self.mergeTileAtIndex(currentX, y: currentY, withTileAtIndex: otherTileX, y: otherTileY)
+                self.mergeTilesAtIndex(currentX, y: currentY, withTileAtIndex: otherTileX, y: otherTileY)
                 movedTilesThisRound = true
               } else {
                 // we cannot merge so we want to perform a move
@@ -205,6 +212,34 @@ class Grid: CCNodeColor {
     return gridArray[x][y] == noTile
   }
   
+  func tileForIndex(x: Int, y: Int) -> Tile? {
+    return self.indexValid(x, y: y) ? gridArray[x][y] : noTile
+  }
+  
+  func movePossible() -> Bool {
+    for i in 0..<gridSize {
+      for j in 0..<gridSize {
+        if let tile = gridArray[i][j] {
+          var topNeighbor = self.tileForIndex(i, y: j+1)
+          var bottomNeighbor = self.tileForIndex(i, y: j-1)
+          var leftNeighbor = self.tileForIndex(i-1, y: j)
+          var rightNeighbor = self.tileForIndex(i+1, y: j)
+          var neighbors = [topNeighbor, bottomNeighbor, leftNeighbor, rightNeighbor]
+          for neighbor in neighbors {
+            if let neighborTile = neighbor {
+              if neighborTile.value == tile.value {
+                return true
+              }
+            }
+          }
+        } else { // empty space on the grid
+          return true
+        }
+      }
+    }
+    return false
+  }
+  
   func moveTile(tile: Tile, fromX: Int, fromY: Int, toX: Int, toY: Int) {
     gridArray[toX][toY] = gridArray[fromX][fromY]
     gridArray[fromX][fromY] = noTile
@@ -213,11 +248,15 @@ class Grid: CCNodeColor {
     tile.runAction(moveTo)
   }
   
-  func mergeTileAtIndex(x: Int, y: Int, withTileAtIndex otherX: Int, y otherY: Int) {
+  func mergeTilesAtIndex(x: Int, y: Int, withTileAtIndex otherX: Int, y otherY: Int) {
     // Update game data
     var mergedTile = gridArray[x][y]!
     var otherTile = gridArray[otherX][otherY]!
+    self.score += mergedTile.value + otherTile.value
     otherTile.mergedThisRound = true
+    if (otherTile.value == winTile) {
+      self.win()
+    }
     gridArray[x][y] = noTile
     
     // Update the UI
@@ -231,12 +270,39 @@ class Grid: CCNodeColor {
     mergedTile.runAction(sequence)
   }
   
+  func win() {
+    self.endGameWithMessage("You win!")
+  }
+  
+  func lose() {
+    self.endGameWithMessage("You lose! :(")
+  }
+  
+  func endGameWithMessage(message: String) {
+    var gameEndPopover: GameEnd = CCBReader.load("GameEnd") as GameEnd
+//    gameEndPopover.positionType = CCPositionTypeNormalized
+    gameEndPopover.positionType = CCPositionType(xUnit: .Normalized, yUnit: .Normalized, corner: .BottomLeft)
+    gameEndPopover.position = ccp(0.5, 0.5)
+    gameEndPopover.zOrder = Int.max
+    gameEndPopover.setMessage(message, score: score)
+    self.addChild(gameEndPopover)
+    
+    let defaults = NSUserDefaults.standardUserDefaults()
+    var highscore = defaults.integerForKey("highscore")
+    if score > highscore {
+      defaults.setInteger(score, forKey: "highscore")
+    }
+  }
+  
   func nextRound() {
     self.spawnRandomTile()
     for column in gridArray {
       for tile in column {
         tile?.mergedThisRound = false
       }
+    }
+    if !self.movePossible() {
+      self.lose()
     }
   }
   
