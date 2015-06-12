@@ -21,13 +21,13 @@ class Grid: CCNodeColor {
   
   var score: Int = 0 {
     didSet {
-      var mainScene = self.parent as MainScene
+      var mainScene = parent as! MainScene
       mainScene.scoreLabel.string = "\(score)"
     }
   }
   
   func didLoadFromCCB() {
-    self.setupBackground()
+    setupBackground()
     
     for i in 0..<gridSize {
       var column = [Tile?]()
@@ -37,19 +37,19 @@ class Grid: CCNodeColor {
       gridArray.append(column)
     }
     
-    self.spawnStartTiles()
+    spawnStartTiles()
     
-    self.setupGestures()
+    setupGestures()
   }
   
   func setupBackground() {
-    var tile: CCNode = CCBReader.load("Tile") as Tile
+    var tile: CCNode = CCBReader.load("Tile") as! Tile
     
     columnWidth = tile.contentSize.width
     columnHeight = tile.contentSize.height
     
-    tileMarginHorizontal = (self.contentSize.width - (CGFloat(gridSize) * columnWidth)) / CGFloat(gridSize + 1)
-    tileMarginVertical = (self.contentSize.height - (CGFloat(gridSize) * columnHeight)) / CGFloat(gridSize + 1)
+    tileMarginHorizontal = (contentSize.width - (CGFloat(gridSize) * columnWidth)) / CGFloat(gridSize + 1)
+    tileMarginVertical = (contentSize.height - (CGFloat(gridSize) * columnHeight)) / CGFloat(gridSize + 1)
     
     var x = tileMarginHorizontal
     var y = tileMarginVertical
@@ -60,7 +60,7 @@ class Grid: CCNodeColor {
         var backgroundTile: CCNodeColor = CCNodeColor.nodeWithColor(CCColor.grayColor()) as CCNodeColor
         backgroundTile.contentSize = CGSize(width: columnWidth, height: columnHeight)
         backgroundTile.position = CGPoint(x: x, y: y)
-        self.addChild(backgroundTile)
+        addChild(backgroundTile)
         x += columnWidth + tileMarginHorizontal
       }
       y += columnHeight + tileMarginVertical
@@ -68,14 +68,14 @@ class Grid: CCNodeColor {
   }
   
   func addTileAtColumn(column: Int, row: Int) {
-    var tile: Tile = CCBReader.load("Tile") as Tile
+    var tile: Tile = CCBReader.load("Tile") as! Tile
     gridArray[column][row] = tile
     tile.scale = 0
-    self.addChild(tile)
-    tile.position = self.positionForColumn(column, row: row)
-    var delay = CCActionDelay.actionWithDuration(0.3) as CCActionDelay
-    var scaleUp = CCActionScaleTo.actionWithDuration(0.2, scale: 1) as CCActionScaleTo
-    var sequence = CCActionSequence.actionWithArray([delay, scaleUp]) as CCActionSequence
+    addChild(tile)
+    tile.position = positionForColumn(column, row: row)
+    var delay = CCActionDelay.actionWithDuration(0.3) as! CCActionDelay
+    var scaleUp = CCActionScaleTo.actionWithDuration(0.2, scale: 1) as! CCActionScaleTo
+    var sequence = CCActionSequence.actionWithArray([delay, scaleUp]) as! CCActionSequence
     tile.runAction(sequence)
   }
   
@@ -87,7 +87,7 @@ class Grid: CCNodeColor {
   
   func spawnStartTiles() {
     for i in 0..<startTiles {
-      self.spawnRandomTile()
+      spawnRandomTile()
     }
   }
   
@@ -98,7 +98,7 @@ class Grid: CCNodeColor {
       let randomColumn = Int(CCRANDOM_0_1() * Float(gridSize))
       let positionFree = gridArray[randomColumn][randomRow] == noTile
       if positionFree {
-        self.addTileAtColumn(randomColumn, row: randomRow)
+        addTileAtColumn(randomColumn, row: randomRow)
         spawned = true
       }
     }
@@ -111,10 +111,10 @@ class Grid: CCNodeColor {
     var currentX = 0
     var currentY = 0
     // Move to relevant edge by applying direction until reaching border
-    while self.indexValid(currentX, y: currentY) {
+    while indexValid(currentX, y: currentY) {
       var newX = currentX + Int(direction.x)
       var newY = currentY + Int(direction.y)
-      if self.indexValid(newX, y: newY) {
+      if indexValid(newX, y: newY) {
         currentX = newX
         currentY = newY
       } else {
@@ -133,8 +133,8 @@ class Grid: CCNodeColor {
       yChange = 1
     }
     // visit column for column
-    while self.indexValid(currentX, y: currentY) {
-      while self.indexValid(currentX, y: currentY) {
+    while indexValid(currentX, y: currentY) {
+      while indexValid(currentX, y: currentY) {
         // get tile at current index
         if let tile = gridArray[currentX][currentY] {
           // if tile is not nil
@@ -142,24 +142,21 @@ class Grid: CCNodeColor {
           var newY = currentY
           // find the farthest position by iterating in direction of the vector until reaching boarding of 
           // grid or occupied cell
-          while self.indexValidAndUnoccupied(newX+Int(direction.x), y: newY+Int(direction.y)) {
+          while indexValidAndUnoccupied(newX+Int(direction.x), y: newY+Int(direction.y)) {
             newX += Int(direction.x)
             newY += Int(direction.y)
           }
-//          if newX != currentX || newY != currentY {
-//            self.moveTile(t, fromX: currentX, fromY: currentY, toX: newX, toY: newY)
-//          }
           var performMove = false
           // If we stopped moving in vector direction, but next index in vector direction is valid, this 
           // means the cell is occupied. Let's check if we can merge them...
-          if self.indexValid(newX+Int(direction.x), y: newY+Int(direction.y)) {
+          if indexValid(newX+Int(direction.x), y: newY+Int(direction.y)) {
             // get the other tile
             var otherTileX = newX + Int(direction.x)
             var otherTileY = newY + Int(direction.y)
             if let otherTile = gridArray[otherTileX][otherTileY] {
               // compare the value of other tile and also check if the other tile has been merged this round
               if tile.value == otherTile.value && !otherTile.mergedThisRound {
-                self.mergeTilesAtIndex(currentX, y: currentY, withTileAtIndex: otherTileX, y: otherTileY)
+                mergeTilesAtIndex(currentX, y: currentY, withTileAtIndex: otherTileX, y: otherTileY)
                 movedTilesThisRound = true
               } else {
                 // we cannot merge so we want to perform a move
@@ -174,7 +171,7 @@ class Grid: CCNodeColor {
             // move tile to furthest position
             if newX != currentX || newY != currentY {
               // only move tile if position changed
-              self.moveTile(tile, fromX: currentX, fromY: currentY, toX: newX, toY: newY)
+              moveTile(tile, fromX: currentX, fromY: currentY, toX: newX, toY: newY)
               movedTilesThisRound = true
             }
           }
@@ -186,18 +183,18 @@ class Grid: CCNodeColor {
       currentY = initialY
     }
     if movedTilesThisRound {
-      self.nextRound()
+      nextRound()
     }
   }
   
   func indexValid(x: Int, y: Int) -> Bool {
+    println("x=\(x),y=\(y)")
     var indexValid = true
-    indexValid &= x >= 0
-    indexValid &= y >= 0
+    indexValid = (x >= 0) && (y >= 0)
     if indexValid {
-      indexValid &= x < Int(gridArray.count)
+      indexValid = x < Int(gridArray.count)
       if indexValid {
-        indexValid &= y < Int(gridArray[x].count)
+        indexValid = y < Int(gridArray[x].count)
       }
     }
     return indexValid
@@ -213,17 +210,17 @@ class Grid: CCNodeColor {
   }
   
   func tileForIndex(x: Int, y: Int) -> Tile? {
-    return self.indexValid(x, y: y) ? gridArray[x][y] : noTile
+    return indexValid(x, y: y) ? gridArray[x][y] : noTile
   }
   
   func movePossible() -> Bool {
     for i in 0..<gridSize {
       for j in 0..<gridSize {
         if let tile = gridArray[i][j] {
-          var topNeighbor = self.tileForIndex(i, y: j+1)
-          var bottomNeighbor = self.tileForIndex(i, y: j-1)
-          var leftNeighbor = self.tileForIndex(i-1, y: j)
-          var rightNeighbor = self.tileForIndex(i+1, y: j)
+          var topNeighbor = tileForIndex(i, y: j+1)
+          var bottomNeighbor = tileForIndex(i, y: j-1)
+          var leftNeighbor = tileForIndex(i-1, y: j)
+          var rightNeighbor = tileForIndex(i+1, y: j)
           var neighbors = [topNeighbor, bottomNeighbor, leftNeighbor, rightNeighbor]
           for neighbor in neighbors {
             if let neighborTile = neighbor {
@@ -243,8 +240,8 @@ class Grid: CCNodeColor {
   func moveTile(tile: Tile, fromX: Int, fromY: Int, toX: Int, toY: Int) {
     gridArray[toX][toY] = gridArray[fromX][fromY]
     gridArray[fromX][fromY] = noTile
-    var newPosition = self.positionForColumn(toX, row: toY)
-    var moveTo = CCActionMoveTo.actionWithDuration(0.2, position: newPosition) as CCActionMoveTo
+    var newPosition = positionForColumn(toX, row: toY)
+    var moveTo = CCActionMoveTo.actionWithDuration(0.2, position: newPosition) as! CCActionMoveTo
     tile.runAction(moveTo)
   }
   
@@ -252,40 +249,40 @@ class Grid: CCNodeColor {
     // Update game data
     var mergedTile = gridArray[x][y]!
     var otherTile = gridArray[otherX][otherY]!
-    self.score += mergedTile.value + otherTile.value
+    score += mergedTile.value + otherTile.value
     otherTile.mergedThisRound = true
     if (otherTile.value == winTile) {
-      self.win()
+      win()
     }
     gridArray[x][y] = noTile
     
     // Update the UI
-    var otherTilePosition = self.positionForColumn(otherX, row: otherY)
-    var moveTo = CCActionMoveTo.actionWithDuration(0.2, position: otherTilePosition) as CCActionMoveTo
-    var remove = CCActionRemove.action() as CCActionRemove
+    var otherTilePosition = positionForColumn(otherX, row: otherY)
+    var moveTo = CCActionMoveTo.actionWithDuration(0.2, position: otherTilePosition) as! CCActionMoveTo
+    var remove = CCActionRemove.action() as! CCActionRemove
     var mergeTile = CCActionCallBlock.actionWithBlock { () -> Void in
       otherTile.value *= 2
-    } as CCActionCallBlock
-    var sequence = CCActionSequence.actionWithArray([moveTo, mergeTile, remove]) as CCActionSequence
+    } as! CCActionCallBlock
+    var sequence = CCActionSequence.actionWithArray([moveTo, mergeTile, remove]) as! CCActionSequence
     mergedTile.runAction(sequence)
   }
   
   func win() {
-    self.endGameWithMessage("You win!")
+    endGameWithMessage("You win!")
   }
   
   func lose() {
-    self.endGameWithMessage("You lose! :(")
+    endGameWithMessage("You lose! :(")
   }
   
   func endGameWithMessage(message: String) {
-    var gameEndPopover: GameEnd = CCBReader.load("GameEnd") as GameEnd
+    var gameEndPopover: GameEnd = CCBReader.load("GameEnd") as! GameEnd
 //    gameEndPopover.positionType = CCPositionTypeNormalized
     gameEndPopover.positionType = CCPositionType(xUnit: .Normalized, yUnit: .Normalized, corner: .BottomLeft)
     gameEndPopover.position = ccp(0.5, 0.5)
     gameEndPopover.zOrder = Int.max
     gameEndPopover.setMessage(message, score: score)
-    self.addChild(gameEndPopover)
+    addChild(gameEndPopover)
     
     let defaults = NSUserDefaults.standardUserDefaults()
     var highscore = defaults.integerForKey("highscore")
@@ -295,14 +292,14 @@ class Grid: CCNodeColor {
   }
   
   func nextRound() {
-    self.spawnRandomTile()
+    spawnRandomTile()
     for column in gridArray {
       for tile in column {
         tile?.mergedThisRound = false
       }
     }
-    if !self.movePossible() {
-      self.lose()
+    if !movePossible() {
+      lose()
     }
   }
   
@@ -325,19 +322,19 @@ class Grid: CCNodeColor {
   }
   
   func swipeLeft() {
-    self.move(CGPoint(x: -1, y: 0))
+    move(CGPoint(x: -1, y: 0))
   }
   
   func swipeRight() {
-    self.move(CGPoint(x: 1, y: 0))
+    move(CGPoint(x: 1, y: 0))
   }
   
   func swipeUp() {
-    self.move(CGPoint(x: 0, y: 1))
+    move(CGPoint(x: 0, y: 1))
   }
   
   func swipeDown() {
-    self.move(CGPoint(x: 0, y: -1))
+    move(CGPoint(x: 0, y: -1))
   }
   
 }
