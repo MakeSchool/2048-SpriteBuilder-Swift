@@ -7,8 +7,8 @@
 //
 
 class Tile: CCNode {
-  var valueLabel: CCLabelTTF!
-  var backgroundNode: CCNodeColor!
+  weak var valueLabel: CCLabelTTF!
+  weak var backgroundNode: CCNodeColor!
   var value: Int = 0 {
     didSet {
       valueLabel.string = "\(value)"

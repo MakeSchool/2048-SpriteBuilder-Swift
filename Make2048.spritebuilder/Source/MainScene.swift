@@ -10,13 +10,13 @@ import Foundation
 import UIKit
 
 class MainScene: CCNode {
-  var grid: Grid!
-  var scoreLabel: CCLabelTTF!
-  var highscoreLabel: CCLabelTTF!
+  weak var grid: Grid!
+  weak var scoreLabel: CCLabelTTF!
+  weak var highscoreLabel: CCLabelTTF!
   
   func didLoadFromCCB() {
     NSUserDefaults.standardUserDefaults().addObserver(self, forKeyPath: "highscore", options: .allZeros, context: nil)
-    self.updateHighscore()
+    updateHighscore()
   }
   
   func updateHighscore() {
@@ -26,7 +26,7 @@ class MainScene: CCNode {
   
   override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
     if keyPath == "highscore" {
-      self.updateHighscore()
+      updateHighscore()
     }
   }
 }

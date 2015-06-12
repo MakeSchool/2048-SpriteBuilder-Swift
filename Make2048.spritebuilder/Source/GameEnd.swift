@@ -7,8 +7,8 @@
 //
 
 class GameEnd: CCNode {
-  var messageLabel: CCLabelTTF!
-  var scoreLabel: CCLabelTTF!
+  weak var messageLabel: CCLabelTTF!
+  weak var scoreLabel: CCLabelTTF!
   
   func newGame() {
     var mainScene: CCScene = CCBReader.loadAsScene("MainScene") as CCScene
