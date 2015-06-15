@@ -32,7 +32,7 @@ class Grid: CCNodeColor {
     for i in 0..<gridSize {
       var column = [Tile?]()
       for j in 0..<gridSize {
-        column.append(nil)
+        column.append(noTile)
       }
       gridArray.append(column)
     }
@@ -43,7 +43,7 @@ class Grid: CCNodeColor {
   }
   
   func setupBackground() {
-    var tile: CCNode = CCBReader.load("Tile") as! Tile
+    var tile = CCBReader.load("Tile") as! Tile
     
     columnWidth = tile.contentSize.width
     columnHeight = tile.contentSize.height
@@ -57,7 +57,7 @@ class Grid: CCNodeColor {
     for i in 0..<gridSize {
       x = tileMarginHorizontal
       for j in 0..<gridSize {
-        var backgroundTile: CCNodeColor = CCNodeColor.nodeWithColor(CCColor.grayColor()) as CCNodeColor
+        var backgroundTile = CCNodeColor.nodeWithColor(CCColor.grayColor())
         backgroundTile.contentSize = CGSize(width: columnWidth, height: columnHeight)
         backgroundTile.position = CGPoint(x: x, y: y)
         addChild(backgroundTile)
@@ -68,7 +68,7 @@ class Grid: CCNodeColor {
   }
   
   func addTileAtColumn(column: Int, row: Int) {
-    var tile: Tile = CCBReader.load("Tile") as! Tile
+    var tile = CCBReader.load("Tile") as! Tile
     gridArray[column][row] = tile
     tile.scale = 0
     addChild(tile)
@@ -137,17 +137,17 @@ class Grid: CCNodeColor {
       while indexValid(currentX, y: currentY) {
         // get tile at current index
         if let tile = gridArray[currentX][currentY] {
-          // if tile is not nil
+          // if tile exists at index
           var newX = currentX
           var newY = currentY
-          // find the farthest position by iterating in direction of the vector until reaching boarding of 
+          // find the farthest position by iterating in direction of the vector until reaching boarding of
           // grid or occupied cell
           while indexValidAndUnoccupied(newX+Int(direction.x), y: newY+Int(direction.y)) {
             newX += Int(direction.x)
             newY += Int(direction.y)
           }
           var performMove = false
-          // If we stopped moving in vector direction, but next index in vector direction is valid, this 
+          // If we stopped moving in vector direction, but next index in vector direction is valid, this
           // means the cell is occupied. Let's check if we can merge them...
           if indexValid(newX+Int(direction.x), y: newY+Int(direction.y)) {
             // get the other tile
@@ -188,7 +188,6 @@ class Grid: CCNodeColor {
   }
   
   func indexValid(x: Int, y: Int) -> Bool {
-    println("x=\(x),y=\(y)")
     var indexValid = true
     indexValid = (x >= 0) && (y >= 0)
     if indexValid {
@@ -262,7 +261,7 @@ class Grid: CCNodeColor {
     var remove = CCActionRemove.action() as! CCActionRemove
     var mergeTile = CCActionCallBlock.actionWithBlock { () -> Void in
       otherTile.value *= 2
-    } as! CCActionCallBlock
+      } as! CCActionCallBlock
     var sequence = CCActionSequence.actionWithArray([moveTo, mergeTile, remove]) as! CCActionSequence
     mergedTile.runAction(sequence)
   }
@@ -276,8 +275,7 @@ class Grid: CCNodeColor {
   }
   
   func endGameWithMessage(message: String) {
-    var gameEndPopover: GameEnd = CCBReader.load("GameEnd") as! GameEnd
-//    gameEndPopover.positionType = CCPositionTypeNormalized
+    var gameEndPopover = CCBReader.load("GameEnd") as! GameEnd
     gameEndPopover.positionType = CCPositionType(xUnit: .Normalized, yUnit: .Normalized, corner: .BottomLeft)
     gameEndPopover.position = ccp(0.5, 0.5)
     gameEndPopover.zOrder = Int.max
@@ -304,19 +302,19 @@ class Grid: CCNodeColor {
   }
   
   func setupGestures() {
-    var swipeLeft = UISwipeGestureRecognizer(target: self, action: "swipeLeft") as UISwipeGestureRecognizer
+    var swipeLeft = UISwipeGestureRecognizer(target: self, action: "swipeLeft")
     swipeLeft.direction = .Left
     CCDirector.sharedDirector().view.addGestureRecognizer(swipeLeft)
     
-    var swipeRight = UISwipeGestureRecognizer(target: self, action: "swipeRight") as UISwipeGestureRecognizer
+    var swipeRight = UISwipeGestureRecognizer(target: self, action: "swipeRight")
     swipeRight.direction = .Right
     CCDirector.sharedDirector().view.addGestureRecognizer(swipeRight)
     
-    var swipeUp = UISwipeGestureRecognizer(target: self, action: "swipeUp") as UISwipeGestureRecognizer
+    var swipeUp = UISwipeGestureRecognizer(target: self, action: "swipeUp")
     swipeUp.direction = .Up
     CCDirector.sharedDirector().view.addGestureRecognizer(swipeUp)
     
-    var swipeDown = UISwipeGestureRecognizer(target: self, action: "swipeDown") as UISwipeGestureRecognizer
+    var swipeDown = UISwipeGestureRecognizer(target: self, action: "swipeDown")
     swipeDown.direction = .Down
     CCDirector.sharedDirector().view.addGestureRecognizer(swipeDown)
   }
