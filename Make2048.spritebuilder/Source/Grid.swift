@@ -200,8 +200,8 @@ class Grid: CCNodeColor {
   }
   
   func indexValidAndUnoccupied(x: Int, y: Int) -> Bool {
-    var indexValid = self.indexValid(x, y: y)
-    if !indexValid {
+    var indexIsValid = indexValid(x, y: y)
+    if !indexIsValid {
       return false
     }
     // unoccupied?
