@@ -250,9 +250,7 @@ class Grid: CCNodeColor {
     var otherTile = gridArray[otherX][otherY]!
     score += mergedTile.value + otherTile.value
     otherTile.mergedThisRound = true
-    if (otherTile.value == winTile) {
-      win()
-    }
+
     gridArray[x][y] = noTile
     
     // Update the UI
@@ -261,8 +259,11 @@ class Grid: CCNodeColor {
     var remove = CCActionRemove.action() as! CCActionRemove
     var mergeTile = CCActionCallBlock.actionWithBlock { () -> Void in
       otherTile.value *= 2
+    } as! CCActionCallBlock
+    var checkWin = CCActionCallBlock.actionWithBlock { () -> Void in
+      if otherTile.value == self.winTile {self.win()}
       } as! CCActionCallBlock
-    var sequence = CCActionSequence.actionWithArray([moveTo, mergeTile, remove]) as! CCActionSequence
+    var sequence = CCActionSequence.actionWithArray([moveTo, mergeTile, checkWin, remove]) as! CCActionSequence
     mergedTile.runAction(sequence)
   }
   
