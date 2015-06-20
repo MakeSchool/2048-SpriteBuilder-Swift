@@ -12,7 +12,7 @@ class GameEnd: CCNode {
   
   func newGame() {
     var mainScene: CCScene = CCBReader.loadAsScene("MainScene") as CCScene
-    CCDirector.sharedDirector().replaceScene(mainScene)
+    CCDirector.sharedDirector().presentScene(mainScene)
   }
   
   func setMessage(message: String, score: Int) {
