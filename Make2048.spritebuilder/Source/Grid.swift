@@ -73,9 +73,9 @@ class Grid: CCNodeColor {
     tile.scale = 0
     addChild(tile)
     tile.position = positionForColumn(column, row: row)
-    var delay = CCActionDelay.actionWithDuration(0.3) as! CCActionDelay
-    var scaleUp = CCActionScaleTo.actionWithDuration(0.2, scale: 1) as! CCActionScaleTo
-    var sequence = CCActionSequence.actionWithArray([delay, scaleUp]) as! CCActionSequence
+    var delay = CCActionDelay(duration: 0.3)
+    var scaleUp = CCActionScaleTo(duration: 0.2, scale: 1)
+    var sequence = CCActionSequence(array: [delay, scaleUp])
     tile.runAction(sequence)
   }
   
@@ -240,7 +240,7 @@ class Grid: CCNodeColor {
     gridArray[toX][toY] = gridArray[fromX][fromY]
     gridArray[fromX][fromY] = noTile
     var newPosition = positionForColumn(toX, row: toY)
-    var moveTo = CCActionMoveTo.actionWithDuration(0.2, position: newPosition) as! CCActionMoveTo
+    var moveTo = CCActionMoveTo(duration: 0.2, position: newPosition)
     tile.runAction(moveTo)
   }
   
@@ -255,15 +255,15 @@ class Grid: CCNodeColor {
     
     // Update the UI
     var otherTilePosition = positionForColumn(otherX, row: otherY)
-    var moveTo = CCActionMoveTo.actionWithDuration(0.2, position: otherTilePosition) as! CCActionMoveTo
-    var remove = CCActionRemove.action() as! CCActionRemove
-    var mergeTile = CCActionCallBlock.actionWithBlock { () -> Void in
+    var moveTo = CCActionMoveTo(duration:0.2, position: otherTilePosition)
+    var remove = CCActionRemove()
+    var mergeTile = CCActionCallBlock(block: { () -> Void in
       otherTile.value *= 2
-    } as! CCActionCallBlock
-    var checkWin = CCActionCallBlock.actionWithBlock { () -> Void in
+    })
+    var checkWin = CCActionCallBlock(block: { () -> Void in
       if otherTile.value == self.winTile {self.win()}
-      } as! CCActionCallBlock
-    var sequence = CCActionSequence.actionWithArray([moveTo, mergeTile, checkWin, remove]) as! CCActionSequence
+    })
+    var sequence = CCActionSequence(array: [moveTo, mergeTile, checkWin, remove])
     mergedTile.runAction(sequence)
   }
   
