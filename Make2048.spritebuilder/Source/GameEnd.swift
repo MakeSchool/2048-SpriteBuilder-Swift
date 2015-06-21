@@ -11,7 +11,7 @@ class GameEnd: CCNode {
   weak var scoreLabel: CCLabelTTF!
   
   func newGame() {
-    var mainScene: CCScene = CCBReader.loadAsScene("MainScene") as CCScene
+    var mainScene = CCBReader.loadAsScene("MainScene")
     CCDirector.sharedDirector().presentScene(mainScene)
   }
   
