@@ -287,6 +287,7 @@ class Grid: CCNodeColor {
     let highscore = defaults.integerForKey("highscore")
     if score > highscore {
       defaults.setInteger(score, forKey: "highscore")
+      defaults.synchronize()
     }
   }
   
