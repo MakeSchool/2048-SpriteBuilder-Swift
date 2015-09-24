@@ -15,16 +15,16 @@ class MainScene: CCNode {
   weak var highscoreLabel: CCLabelTTF!
   
   func didLoadFromCCB() {
-    NSUserDefaults.standardUserDefaults().addObserver(self, forKeyPath: "highscore", options: .allZeros, context: nil)
+    NSUserDefaults.standardUserDefaults().addObserver(self, forKeyPath: "highscore", options: [], context: nil)
     updateHighscore()
   }
   
   func updateHighscore() {
-    var newHighscore = NSUserDefaults.standardUserDefaults().integerForKey("highscore")
+    let newHighscore = NSUserDefaults.standardUserDefaults().integerForKey("highscore")
     highscoreLabel.string = "\(newHighscore)"
   }
   
-  override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
+  override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
     if keyPath == "highscore" {
       updateHighscore()
     }
