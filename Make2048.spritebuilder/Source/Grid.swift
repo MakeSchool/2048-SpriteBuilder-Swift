@@ -57,7 +57,7 @@ class Grid: CCNodeColor {
     for _ in 0..<gridSize {
       x = tileMarginHorizontal
       for _ in 0..<gridSize {
-        let backgroundTile = CCNodeColor.nodeWithColor(CCColor.grayColor())
+        let backgroundTile = CCNodeColor(color: CCColor.grayColor())
         backgroundTile.contentSize = CGSize(width: columnWidth, height: columnHeight)
         backgroundTile.position = CGPoint(x: x, y: y)
         addChild(backgroundTile)
